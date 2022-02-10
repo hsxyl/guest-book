@@ -14,3 +14,8 @@ neardev/dev-account*
 
 # misc
 yarn-error.log
+
+# ignore rust contract
+**/target/
+**/out/
+/.idea/

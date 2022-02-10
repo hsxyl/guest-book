@@ -1,20 +1,10 @@
-use std::cmp::{max, min};
-use std::collections::BinaryHeap;
-use std::convert::{TryFrom};
-use std::fmt;
-
 use itertools::Itertools;
-use near_contract_standards::fungible_token::receiver::FungibleTokenReceiver;
-use near_contract_standards::non_fungible_token::{TokenId};
-use near_contract_standards::non_fungible_token::core::NonFungibleTokenReceiver;
-use near_contract_standards::non_fungible_token::NonFungibleToken;
-use near_sdk::{AccountId, BorshStorageKey, env, log, near_bindgen, PanicOnDefault, Promise, PromiseOrValue, Timestamp};
+use near_sdk::{BorshStorageKey, env,near_bindgen, PanicOnDefault};
 use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::collections::{LazyOption, LookupMap, TreeMap, UnorderedMap, UnorderedSet, Vector};
-use near_sdk::json_types::{U128, U64, ValidAccountId};
+use near_sdk::collections::{Vector};
+use near_sdk::json_types::{U128, U64, };
 use near_sdk::serde::{Deserialize, Serialize};
-
-
+use std::cmp::{min};
 
 near_sdk::setup_alloc!();
 const MESSAGE_LIMIT: u64 = 10;
@@ -57,21 +47,20 @@ impl Contract {
   }
 
   pub fn getMessages(&self) -> Vec<PostedMessage> {
-    let skip_num = if self.messages.len() >= MESSAGE_LIMIT { self.messages.len() - MESSAGE_LIMIT } else { 0 };
-    let mut vec = self.messages.iter()
-      .skip(skip_num as usize)
+    return (0..self.messages.len()).rev()
+      .take(min(MESSAGE_LIMIT, self.messages.len()) as usize)
+      .map(|i| self.messages.get(i).unwrap())
       .collect_vec();
-    vec.reverse();
-    vec
   }
 }
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+  use near_sdk::{MockedBlockchain, testing_env};
   use near_sdk::json_types::ValidAccountId;
   use near_sdk::test_utils::{accounts, VMContextBuilder};
-  use near_sdk::{testing_env, MockedBlockchain};
+
+  use super::*;
 
   const BLOCK_START_BLOCK: u64 = 52_201_040;
   const BLOCK_START_TS: u64 = 1_624_151_503_447_000_000;
